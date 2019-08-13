@@ -6,6 +6,7 @@ Build-Depends:
  debhelper (>= 9~)
  , libluajit-5.1-dev
  , libssl-dev
+ , zlib1g-dev
  , luajit
  , pkg-config
 Standards-Version: 3.9.8
