@@ -1,0 +1,72 @@
+From 7dbe8c5908f8ed81eb2650ed0bf1f17b7688f2b0 Mon Sep 17 00:00:00 2001
+From: Hiroaki Nakamura <hnakamur@gmail.com>
+Date: Tue, 13 Aug 2019 08:44:11 +0900
+Subject: [PATCH] Use luajit 2.1 (OpenResty LuaJIT 2.1 beta3)
+
+---
+ src/script.c | 6 +++---
+ src/script.h | 6 +++---
+ src/wrk.h    | 2 +-
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/src/script.c b/src/script.c
+index 08ff7eb..68a5d08 100644
+--- a/src/script.c
++++ b/src/script.c
+@@ -26,20 +26,20 @@ static void set_fields(lua_State *, int, const table_field *);
+ static void set_field(lua_State *, int, char *, int);
+ static int push_url_part(lua_State *, char *, struct http_parser_url *, enum http_parser_url_fields);
+ 
+-static const struct luaL_reg addrlib[] = {
++static const struct luaL_Reg addrlib[] = {
+     { "__tostring", script_addr_tostring   },
+     { "__gc"    ,   script_addr_gc         },
+     { NULL,         NULL                   }
+ };
+ 
+-static const struct luaL_reg statslib[] = {
++static const struct luaL_Reg statslib[] = {
+     { "__call",     script_stats_call      },
+     { "__index",    script_stats_index     },
+     { "__len",      script_stats_len       },
+     { NULL,         NULL                   }
+ };
+ 
+-static const struct luaL_reg threadlib[] = {
++static const struct luaL_Reg threadlib[] = {
+     { "__index",    script_thread_index    },
+     { "__newindex", script_thread_newindex },
+     { NULL,         NULL                   }
+diff --git a/src/script.h b/src/script.h
+index 53522cf..02b9e18 100644
+--- a/src/script.h
++++ b/src/script.h
+@@ -2,9 +2,9 @@
+ #define SCRIPT_H
+ 
+ #include <stdbool.h>
+-#include <luajit-2.0/lua.h>
+-#include <luajit-2.0/lualib.h>
+-#include <luajit-2.0/lauxlib.h>
++#include <luajit-2.1/lua.h>
++#include <luajit-2.1/lualib.h>
++#include <luajit-2.1/lauxlib.h>
+ #include <unistd.h>
+ #include "stats.h"
+ #include "wrk.h"
+diff --git a/src/wrk.h b/src/wrk.h
+index 3fe77f1..d691c9d 100644
+--- a/src/wrk.h
++++ b/src/wrk.h
+@@ -10,7 +10,7 @@
+ 
+ #include <openssl/ssl.h>
+ #include <openssl/err.h>
+-#include <luajit-2.0/lua.h>
++#include <luajit-2.1/lua.h>
+ 
+ #include "stats.h"
+ #include "ae.h"
+-- 
+2.17.1
+

@@ -1,0 +1,78 @@
+Subject: Collected Debian patches for wrk
+Author: Robert Edmonds <edmonds@debian.org>
+
+The wrk package is maintained in Git rather than maintaining
+patches as separate files, and separating the patches doesn't seem to
+be worth the effort.  They are therefore all included in this single
+Debian patch.
+
+For full commit history and separated commits, see the packaging Git
+repository.
+--- wrk-4.0.2.orig/Makefile
++++ wrk-4.0.2/Makefile
+@@ -1,21 +1,11 @@
+-CFLAGS  += -std=c99 -Wall -O2 -D_REENTRANT
+-LIBS    := -lpthread -lm -lssl -lcrypto
++CFLAGS   += -O2 -std=c99 -Wall -D_REENTRANT -D_POSIX_C_SOURCE=200112L -D_BSD_SOURCE
++LIBS     += -lpthread -lm -lcrypto -lssl
++LDFLAGS  += -Wl,-E
+ 
+-TARGET  := $(shell uname -s | tr '[A-Z]' '[a-z]' 2>/dev/null || echo unknown)
++CFLAGS   += $(shell pkg-config --cflags luajit)
++LIBS     += $(shell pkg-config --libs luajit)
+ 
+-ifeq ($(TARGET), sunos)
+-	CFLAGS += -D_PTHREADS -D_POSIX_C_SOURCE=200112L
+-	LIBS   += -lsocket
+-else ifeq ($(TARGET), darwin)
+-	LDFLAGS += -pagezero_size 10000 -image_base 100000000
+-else ifeq ($(TARGET), linux)
+-	CFLAGS  += -D_POSIX_C_SOURCE=200112L -D_BSD_SOURCE
+-	LIBS    += -ldl
+-	LDFLAGS += -Wl,-E
+-else ifeq ($(TARGET), freebsd)
+-	CFLAGS  += -D_DECLARE_C99_LDBL_MATH
+-	LDFLAGS += -Wl,-E
+-endif
++CFLAGS   += $(CPPFLAGS)
+ 
+ SRC  := wrk.c net.c ssl.c aprintf.c stats.c script.c units.c \
+ 		ae.c zmalloc.c http_parser.c
+@@ -50,8 +40,7 @@ clean:
+ 	$(RM) -rf $(BIN) obj/*
+ 
+ $(BIN): $(OBJ)
+-	@echo LINK $(BIN)
+-	@$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
++	$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
+ 
+ $(OBJ): config.h Makefile $(DEPS) | $(ODIR)
+ 
+--- wrk-4.0.2.orig/src/stats.c
++++ wrk-4.0.2/src/stats.c
+@@ -21,12 +21,21 @@ void stats_free(stats *stats) {
+ 
+ int stats_record(stats *stats, uint64_t n) {
+     if (n >= stats->limit) return 0;
+-    __sync_fetch_and_add(&stats->data[n], 1);
+-    __sync_fetch_and_add(&stats->count, 1);
++    __atomic_fetch_add(&stats->data[n], 1, __ATOMIC_SEQ_CST);
++    __atomic_fetch_add(&stats->count, 1, __ATOMIC_SEQ_CST);
+     uint64_t min = stats->min;
+     uint64_t max = stats->max;
+-    while (n < min) min = __sync_val_compare_and_swap(&stats->min, min, n);
+-    while (n > max) max = __sync_val_compare_and_swap(&stats->max, max, n);
++    while (n < min) {
++        __atomic_compare_exchange(&stats->min, &min, &n, false,
++                                  __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
++        min = stats->min;
++    }
++    while (n > max) {
++        __atomic_compare_exchange(&stats->max, &max, &n, false,
++                                  __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
++        max = stats->max;
++    }
++
+     return 1;
+ }
+ 

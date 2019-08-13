@@ -1,0 +1,26 @@
+Source: wrk2
+Section: web
+Priority: optional
+Maintainer: Hiroaki Nakamura <hnakamur@gmail.com>
+Build-Depends:
+ debhelper (>= 9~)
+ , libluajit-5.1-dev
+ , libssl-dev
+ , luajit
+ , pkg-config
+Standards-Version: 3.9.8
+Homepage: https://github.com/giltene/wrk2
+Vcs-Browser: https://github.com/hnakamur/wrk2-deb.git
+Vcs-Git: https://github.com/hnakamur/wrk2-deb.git
+
+Package: wrk2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: HTTP benchmarking tool
+ wrk2 is a HTTP benchmarking tool based mostly on wrk.
+ In addition to wrk's arguments, wrk2 takes a throughput argument
+ (in total requests per second) via either the --rate or -R parameters
+ (default is 1000).
+ .
+ An optional LuaJIT script can perform HTTP request generation, response
+ processing, and custom reporting.

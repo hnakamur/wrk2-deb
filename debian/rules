@@ -1,0 +1,17 @@
+#!/usr/bin/make -f
+
+DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+ifeq ($(DEB_HOST_ARCH),$(filter $(DEB_HOST_ARCH),mips mipsel powerpc))
+	LIBS += -latomic
+	export LIBS
+endif
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	$(MAKE) WITH_LUAJIT=/usr WITH_OPENSSL=/usr VER=debian/$(shell dpkg-parsechangelog -SVersion)
+	mv wrk wrk2
