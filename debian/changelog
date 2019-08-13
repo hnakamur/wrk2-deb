@@ -1,5 +1,6 @@
 wrk2 (0.20180304.gite0109df-1ppa1~bionic) bionic; urgency=medium
 
   * Initial release.
+  * Update patch for OpenResty LuaJIT 2.1.0 beta3
 
  -- Hiroaki Nakamura <hnakamur@gmail.com>  Tue, 13 Aug 2019 09:39:25 +0900
