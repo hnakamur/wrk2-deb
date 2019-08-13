@@ -1,2 +1,2 @@
-debian-changes
+debian.makefile.patch
 use-openresty-luajit-2.1.patch

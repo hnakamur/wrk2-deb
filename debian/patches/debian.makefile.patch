@@ -8,11 +8,11 @@ Debian patch.
 
 For full commit history and separated commits, see the packaging Git
 repository.
---- wrk-4.0.2.orig/Makefile
-+++ wrk-4.0.2/Makefile
-@@ -1,21 +1,11 @@
--CFLAGS  += -std=c99 -Wall -O2 -D_REENTRANT
--LIBS    := -lpthread -lm -lssl -lcrypto
+--- a/Makefile
++++ b/Makefile
+@@ -1,23 +1,11 @@
+-CFLAGS  := -std=c99 -Wall -O2 -D_REENTRANT
+-LIBS    := -lpthread -lm -lcrypto -lssl
 +CFLAGS   += -O2 -std=c99 -Wall -D_REENTRANT -D_POSIX_C_SOURCE=200112L -D_BSD_SOURCE
 +LIBS     += -lpthread -lm -lcrypto -lssl
 +LDFLAGS  += -Wl,-E
@@ -26,8 +26,10 @@ repository.
 -	LIBS   += -lsocket
 -else ifeq ($(TARGET), darwin)
 -	LDFLAGS += -pagezero_size 10000 -image_base 100000000
+-	LIBS += -L/usr/local/opt/openssl/lib
+-	CFLAGS += -I/usr/local/include -I/usr/local/opt/openssl/include
 -else ifeq ($(TARGET), linux)
--	CFLAGS  += -D_POSIX_C_SOURCE=200112L -D_BSD_SOURCE
+-        CFLAGS  += -D_POSIX_C_SOURCE=200809L -D_BSD_SOURCE
 -	LIBS    += -ldl
 -	LDFLAGS += -Wl,-E
 -else ifeq ($(TARGET), freebsd)
@@ -37,14 +39,14 @@ repository.
 +CFLAGS   += $(CPPFLAGS)
  
  SRC  := wrk.c net.c ssl.c aprintf.c stats.c script.c units.c \
- 		ae.c zmalloc.c http_parser.c
-@@ -50,8 +40,7 @@ clean:
- 	$(RM) -rf $(BIN) obj/*
+ 		ae.c zmalloc.c http_parser.c tinymt64.c hdr_histogram.c
+@@ -38,8 +26,7 @@
+ 	@$(MAKE) -C deps/luajit clean
  
  $(BIN): $(OBJ)
 -	@echo LINK $(BIN)
 -	@$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
 +	$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
  
- $(OBJ): config.h Makefile $(DEPS) | $(ODIR)
+ $(OBJ): config.h Makefile $(LDIR)/libluajit.a | $(ODIR)
  
