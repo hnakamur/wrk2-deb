@@ -1,3 +1,10 @@
+wrk2 (0.20190924.git44a94c1-1ppa1~bionic) bionic; urgency=medium
+
+  * New upstream version 0.20190924.git44a94c1
+  * Delete patch
+
+ -- Hiroaki Nakamura <hnakamur@gmail.com>  Tue, 22 Jun 2021 14:47:09 +0900
+
 wrk2 (0.20180304.gite0109df-1ppa1~bionic) bionic; urgency=medium
 
   * Initial release.
